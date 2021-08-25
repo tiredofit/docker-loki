@@ -1,0 +1,84 @@
+#!/usr/bin/with-contenv bash
+
+source /assets/functions/00-container
+prepare_service single
+PROCESS_NAME="loki"
+
+mkdir -p "${CONFIG_PATH}"
+mkdir -p "${STORAGE_BOLTDB_PATH}"
+mkdir -p "${STORAGE_FILESYSTEM_PATH}"
+mkdir -p "${STORAGE_BOLTDB_SHIPPER_ACTIVEINDEX_PATH}"
+mkdir -p "${STORAGE_BOLTDB_SHIPPER_CACHE_PATH}"
+mkdir -p "${STORAGE_BOLTDB_SHIPPER_COMPACTOR_PATH}"
+touch "${CONFIG_PATH}"/"${CONFIG_FILE}"
+
+sed -i "s|<LOKI_LISTEN_PORT>|${LISTEN_PORT}|g" /etc/nginx/conf.d/default.conf
+
+if [ "${SETUP_TYPE}" = "AUTO" ] || [ "${SETUP_TYPE}" = "auto" ] ; then
+    print_debug "Configuring Loki"
+    cat <<EOF > "${CONFIG_PATH}"/"${CONFIG_FILE}"
+# Generated on $(TZ=${TIMEZONE} date +'%Y-%m-%d %H:%M:%S %Z')
+
+auth_enabled: ${ENABLE_AUTH,,}
+
+server:
+  http_listen_port: ${LISTEN_PORT}
+
+ingester:
+  lifecycler:
+    address: ${INGESTER_LIFECYCLER_ADDRESS}
+    ring:
+      kvstore:
+        store: ${INGESTER_LIFECYCLER_RING_KVSTORE,,}
+      replication_factor: ${INGESTER_LIFECYCLER_RING_REPLICATION_FACTOR}
+    final_sleep: ${INGESTER_LIFECYCLER_FINAL_SLEEP}
+  chunk_encoding: ${INGESTER_CHUNK_ENCODING,,}
+  chunk_idle_period: ${INGESTER_CHUNK_IDLE_PERIOD}
+  chunk_retain_period: ${INGESTER_CHUNK_RETAIN_PERIOD}
+  chunk_target_size: ${INGESTER_CHUNK_TARGET_SIZE}
+  max_transfer_retries: ${INGESTER_MAX_TRANSFER_RETRIES}
+
+schema_config:
+  configs:
+  - from: 2020-05-15
+    store: ${SCHEMA_STORE,,}
+    object_store: ${SCHEMA_OBJECT_STORE,,}
+    schema: v11
+    index:
+      prefix: ${SCHEMA_INDEX_PREFIX,,}
+      period: ${SCHEMA_INDEX_PERIOD,,}
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: ${STORAGE_BOLTDB_SHIPPER_ACTIVEINDEX_PATH}
+    cache_location: ${STORAGE_BOLTDB_SHIPPER_CACHE_PATH}
+    cache_ttl: ${STORAGE_BOLTDB_SHIPPER_CACHE_TTL}
+    shared_store: ${STORAGE_BOLTDB_SHIPPER_SHARED_STORE,,}
+
+  filesystem:
+    directory: ${STORAGE_FILESYSTEM_PATH}
+
+compactor:
+  working_directory: ${STORAGE_BOLTDB_SHIPPER_COMPACTOR_PATH}
+  shared_store: ${COMPACTOR_SHARED_STORE,,}
+
+limits_config:
+  enforce_metric_name: ${LIMITS_ENFORCE_METRIC_NAME,,}
+  reject_old_samples: ${LIMITS_REJECT_OLD_SAMPLES,,}
+  reject_old_samples_max_age: ${LIMITS_REJECT_OLD_SAMPLES_MAX_AGE,,}
+  ingestion_rate_mb: ${LIMITS_INGESTION_RATE_MB}
+  ingestion_burst_size_mb: ${LIMITS_BURST_SIZE_MB}
+
+table_manager:
+  retention_deletes_enabled: ${TABLE_RETENTION_DELETES,,}
+  retention_period: ${TABLE_RETENION_PERIOD,,}
+
+chunk_store_config:
+  max_look_back_period: ${CHUNK_MAX_LOOK_BACK,,}
+
+EOF
+    else
+        print_info "Not auto configuring loki"
+    fi
+
+liftoff
