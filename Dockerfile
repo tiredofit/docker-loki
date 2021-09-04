@@ -15,10 +15,18 @@ RUN set -x && \
         *) echo >&2 "Error: unsupported architecture ($apkArch)"; exit 1 ;; \
     esac; \
     curl -sS -o /usr/src/loki.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/loki-linux-${lokiArch}.zip && \
+    curl -sS -o /usr/src/logcli.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/logcli-linux-${lokiArch}.zip && \
+    curl -sS -o /usr/src/canary.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/loki-canary-linux-${lokiArch}.zip && \
     cd /usr/src && \
     unzip -d . loki.zip && \
     chmod +x loki-linux-${lokiArch} && \
     mv loki-linux-${lokiArch} /usr/sbin/loki && \
+    unzip -d . logcli.zip && \
+    chmod +x logcli-linux-${lokiArch} && \
+    mv logcli-linux-${lokiArch} /usr/sbin/logcli && \
+    unzip -d . canary.zip && \
+    chmod +x loki-canary-linux-${lokiArch} && \
+    mv loki-canary-linux-${lokiArch} /usr/sbin/loki-canary && \
     # Cleanup
     rm -rf /usr/src/* && \
     rm -rf /tmp/* /var/cache/apk/*
