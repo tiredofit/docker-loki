@@ -1,35 +1,30 @@
-FROM tiredofit/nginx:alpine-3.14
+FROM docker.io/tiredofit/nginx:alpine-3.14
 LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
-ENV LOKI_VERSION=2.3.0
+ENV LOKI_VERSION=main
 
 RUN set -x && \
     apk update && \
     apk upgrade && \
-    apkArch="$(apk --print-arch)" && \
-    case "$apkArch" in \
-        x86_64) lokiArch='amd64' ;; \
-        armv7) lokiArch='arm' ;; \
-        armhf) lokiArch='arm' ;; \
-        aarch64) lokiArch='arm64' ;; \
-        *) echo >&2 "Error: unsupported architecture ($apkArch)"; exit 1 ;; \
-    esac; \
-    curl -sS -o /usr/src/loki.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/loki-linux-${lokiArch}.zip && \
-    curl -sS -o /usr/src/logcli.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/logcli-linux-${lokiArch}.zip && \
-    curl -sS -o /usr/src/canary.zip -L https://github.com/grafana/loki/releases/download/v${LOKI_VERSION}/loki-canary-linux-${lokiArch}.zip && \
-    cd /usr/src && \
-    unzip -d . loki.zip && \
-    chmod +x loki-linux-${lokiArch} && \
-    mv loki-linux-${lokiArch} /usr/sbin/loki && \
-    unzip -d . logcli.zip && \
-    chmod +x logcli-linux-${lokiArch} && \
-    mv logcli-linux-${lokiArch} /usr/sbin/logcli && \
-    unzip -d . canary.zip && \
-    chmod +x loki-canary-linux-${lokiArch} && \
-    mv loki-canary-linux-${lokiArch} /usr/sbin/loki-canary && \
+    apk add -t .loki-build-deps \
+               git \
+               go \
+               && \
+    \
+    git clone https://github.com/grafana/loki /usr/src/loki && \
+    cd /usr/src/loki && \
+    git checkout ${LOKI_VERSION} && \
+    go build ./cmd/logcli && \
+    mv logcli /usr/sbin && \
+    go build ./cmd/loki && \
+    mv loki /usr/sbin && \
+    go build ./cmd/loki-canary && \
+    mv loki-canary /usr/sbin && \
+    \
     # Cleanup
+    apk del .loki-build-deps && \
     rm -rf /usr/src/* && \
-    rm -rf /tmp/* /var/cache/apk/*
+    rm -rf /root/.cache /tmp/* /var/cache/apk/*
 
 ### Add Files and Assets
 ADD install /
