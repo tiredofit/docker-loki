@@ -1,7 +1,7 @@
 FROM docker.io/tiredofit/nginx:alpine-3.14
 LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
-ENV LOKI_VERSION=main
+ENV LOKI_VERSION=v2.4.1
 
 RUN set -x && \
     apk update && \

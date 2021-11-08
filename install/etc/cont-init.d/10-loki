@@ -5,11 +5,75 @@ prepare_service single
 PROCESS_NAME="loki"
 
 mkdir -p "${CONFIG_PATH}"
-mkdir -p "${STORAGE_BOLTDB_PATH}"
-mkdir -p "${STORAGE_FILESYSTEM_PATH}"
-mkdir -p "${STORAGE_BOLTDB_SHIPPER_ACTIVEINDEX_PATH}"
-mkdir -p "${STORAGE_BOLTDB_SHIPPER_CACHE_PATH}"
-mkdir -p "${STORAGE_BOLTDB_SHIPPER_COMPACTOR_PATH}"
+    mkdir -p "${STORAGE_BOLTDB_PATH}"
+    mkdir -p "${STORAGE_BOLTDB_SHIPPER_ACTIVEINDEX_PATH}"
+    mkdir -p "${STORAGE_BOLTDB_SHIPPER_CACHE_PATH}"
+
+case "${STORAGE_BOLTDB_SHIPPER_SHARED_STORE,,}" in
+  "filesystem" )
+    storage_boltdb_shared_store="filesystem"
+    generate_storage_filesystem=true
+  ;;
+  "aws" | "s3" )
+    storage_boltdb_shared_store="aws"
+    generate_storage_s3=true
+esac
+
+case "${STORAGE_COMPACTOR_SHARED_STORE,,}" in
+  "filesystem" )
+    mkdir -p "${STORAGE_COMPACTOR_PATH}"
+    storage_compactor_shared_store="filesystem"
+    generate_storage_filesystem=true
+  ;;
+  "aws" | "s3" )
+    storage_compactor_shared_store="aws"
+    generate_storage_s3=true
+esac
+
+case "${STORAGE_SCHEMA_OBJECT_STORE,,}" in
+  "filesystem" )
+    mkdir -p "${STORAGE_FILESYSTEM_PATH}"
+    storage_object_shared_store="filesystem"
+    generate_storage_filesystem=true
+  ;;
+  "aws" | "s3" )
+    storage_object_shared_store="aws"
+    generate_storage_s3=true
+esac
+
+if var_true "${generate_storage_filesystem}" ; then
+  storage_arg=$(echo "${storage_arg}" ; cat<<EOF
+  filesystem:
+    directory: ${STORAGE_FILESYSTEM_PATH}
+EOF
+                )
+fi
+
+if var_true "${generate_storage_s3}" ; then
+  sanity_var STORAGE_S3_BUCKET "S3 Bucket Name"
+  sanity_var STORAGE_S3_ENDPOINT "S3 Endpoint"
+  sanity_var STORAGE_S3_REGION "S3 Bucket Region"
+  sanity_var STORAGE_S3_ACCESS_ID "S3 Access ID"
+  sanity_var STORAGE_S3_ACCESS_KEY "S3 Access Key"
+
+  storage_arg=$(echo "${storage_arg}" ; cat<<EOF
+  aws:
+    bucketnames: ${STORAGE_S3_BUCKET}
+    endpoint: ${STORAGE_S3_ENDPOINT}
+    region: ${STORAGE_S3_REGION}
+    access_key_id: ${STORAGE_S3_ACCESS_ID}
+    secret_access_key: ${STORAGE_S3_ACCESS_KEY}
+    insecure: ${STORAGE_S3_INSECURE,,}
+    sse_encryption: ${STORAGE_S3_SSE_ENCRYPTION,,}
+    http_config:
+      idle_conn_timeout: ${STORAGE_S3_HTTP_TIMEOUT_IDLE,,}
+      response_header_timeout: ${STORAGE_S3_HTTP_TIMEOUT_RESPONSEHEADER,,}
+      insecure_skip_verify: ${STORAGE_S3_HTTP_INSECURE_SKIP_VERIFY,,}
+    s3forcepathstyle: ${STORAGE_S3_FORCE_PATH_STYLE,,}
+EOF
+                )
+fi
+
 touch "${CONFIG_PATH}"/"${CONFIG_FILE}"
 
 sed -i "s|<LOKI_LISTEN_PORT>|${LISTEN_PORT}|g" /etc/nginx/conf.d/default.conf
@@ -23,6 +87,9 @@ auth_enabled: ${ENABLE_AUTH,,}
 
 server:
   http_listen_port: ${LISTEN_PORT}
+  log_level: ${LOG_LEVEL,,}
+  grpc_server_max_recv_msg_size: ${GRPC_SERVER_MAX_RECV_MSG_SIZE}
+  grpc_server_max_send_msg_size: ${GRPC_SERVER_MAX_SEND_MSG_SIZE}
 
 ingester:
   lifecycler:
@@ -40,9 +107,9 @@ ingester:
 
 schema_config:
   configs:
-  - from: 2020-05-15
+  - from: 2020-07-01
     store: ${SCHEMA_STORE,,}
-    object_store: ${SCHEMA_OBJECT_STORE,,}
+    object_store: ${storage_object_shared_store}
     schema: v11
     index:
       prefix: ${SCHEMA_INDEX_PREFIX,,}
@@ -53,14 +120,13 @@ storage_config:
     active_index_directory: ${STORAGE_BOLTDB_SHIPPER_ACTIVEINDEX_PATH}
     cache_location: ${STORAGE_BOLTDB_SHIPPER_CACHE_PATH}
     cache_ttl: ${STORAGE_BOLTDB_SHIPPER_CACHE_TTL}
-    shared_store: ${STORAGE_BOLTDB_SHIPPER_SHARED_STORE,,}
+    shared_store: ${storage_boltdb_shared_store}
+${storage_arg}
 
-  filesystem:
-    directory: ${STORAGE_FILESYSTEM_PATH}
 
 compactor:
-  working_directory: ${STORAGE_BOLTDB_SHIPPER_COMPACTOR_PATH}
-  shared_store: ${COMPACTOR_SHARED_STORE,,}
+  working_directory: ${STORAGE_COMPACTOR_PATH}
+  shared_store: ${storage_compactor_shared_store}
 
 limits_config:
   enforce_metric_name: ${LIMITS_ENFORCE_METRIC_NAME,,}
