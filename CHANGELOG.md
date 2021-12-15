@@ -1,3 +1,9 @@
+## 0.0.5 2021-12-15 <dave at tiredofit dot ca>
+
+   ### Added
+      - Add autoregister support for Zabbix Monitoring
+
+
 ## 0.0.4 2021-11-08 <dave at tiredofit dot ca>
 
    ### Added
