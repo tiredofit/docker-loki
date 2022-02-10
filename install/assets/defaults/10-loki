@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 
 STORAGE_COMPACTOR_SHARED_STORE=${STORAGE_COMPACTOR_SHARED_STORE:-"filesystem"}
 CONFIG_FILE=${CONFIG_FILE:-"loki.yml"}
