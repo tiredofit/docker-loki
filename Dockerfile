@@ -1,7 +1,7 @@
 FROM docker.io/tiredofit/nginx:alpine-3.15
 LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
-ENV LOKI_VERSION=v2.4.1 \
+ENV LOKI_VERSION=v2.5.0 \
     IMAGE_NAME="tiredofit/loki" \
     IMAGE_REPO_URL="https://github.com/tiredofit/docker-loki/"
 
