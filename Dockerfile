@@ -2,6 +2,7 @@ FROM docker.io/tiredofit/nginx:alpine-3.16
 LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
 ENV LOKI_VERSION=v2.5.0 \
+    NGINX_SITE_ENABLED=loki \
     IMAGE_NAME="tiredofit/loki" \
     IMAGE_REPO_URL="https://github.com/tiredofit/docker-loki/"
 
