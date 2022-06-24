@@ -1,3 +1,9 @@
+## 0.0.10 2022-06-24 <dave at tiredofit dot ca>
+
+   ### Added
+      - Switch back to Alpine 3.15 for now
+
+
 ## 0.0.9 2022-06-23 <dave at tiredofit dot ca>
 
    ### Added
