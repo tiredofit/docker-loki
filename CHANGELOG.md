@@ -1,3 +1,9 @@
+## 0.0.12 2022-07-08 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Rely on Environment variable isntead of hardcoded for upstream
+
+
 ## 0.0.11 2022-07-08 <dave at tiredofit dot ca>
 
    ### Added
