@@ -2,7 +2,7 @@
 
 source /assets/functions/00-container
 PROCESS_NAME="loki"
-prepare_service defaults single
+prepare_service defaults
 
 check_container_initialized
 check_service_initialized init

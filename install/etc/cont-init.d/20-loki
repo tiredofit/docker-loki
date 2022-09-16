@@ -1,7 +1,7 @@
 #!/command/with-contenv bash
 
 source /assets/functions/00-container
-prepare_service single
+prepare_service
 prepare_service 03-monitoring
 PROCESS_NAME="loki"
 
@@ -79,9 +79,9 @@ fi
 
 touch "${CONFIG_PATH}"/"${CONFIG_FILE}"
 
-sed -i "s|<LOKI_LISTEN_PORT>|${LISTEN_PORT}|g" /etc/nginx/sites.available/${NGINX_SITE_ENABLE}.conf
+sed -i "s|<LOKI_LISTEN_PORT>|${LISTEN_PORT}|g" /etc/nginx/sites.available/${NGINX_SITE_ENABLED}.conf
 
-if [ "${SETUP_TYPE,,}" = auto" ] ; then
+if [ "${SETUP_TYPE,,}" = "auto" ] ; then
     print_debug "Configuring Loki"
     cat <<EOF > "${CONFIG_PATH}"/"${CONFIG_FILE}"
 # Generated on $(TZ=${TIMEZONE} date +'%Y-%m-%d %H:%M:%S %Z')

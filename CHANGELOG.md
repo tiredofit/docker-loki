@@ -1,3 +1,9 @@
+## 0.0.15 2022-09-16 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Fixes
+
+
 ## 0.0.14 2022-09-16 <dave at tiredofit dot ca>
 
    ### Changed
