@@ -9,4 +9,4 @@ check_service_initialized init
 liftoff
 
 print_start "Starting loki ${LOKI_VERSION}"
-loki -config.file ${CONFIG_PATH}/${CONFIG_FILE}
+exec loki -config.file ${CONFIG_PATH}/${CONFIG_FILE}
