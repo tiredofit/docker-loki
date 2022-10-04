@@ -6,7 +6,8 @@ ENV LOKI_VERSION=v2.6.1 \
     IMAGE_NAME="tiredofit/loki" \
     IMAGE_REPO_URL="https://github.com/tiredofit/docker-loki/"
 
-RUN set -x && \
+RUN source /assets/functions/00-container && \
+    set -x && \
     apk update && \
     apk upgrade && \
     apk add -t .loki-build-deps \
@@ -14,9 +15,7 @@ RUN set -x && \
                go \
                && \
     \
-    git clone https://github.com/grafana/loki /usr/src/loki && \
-    cd /usr/src/loki && \
-    git checkout ${LOKI_VERSION} && \
+    clone_git_repo https://github.com/grafana/loki ${LOKI_VERSION} && \
     go build ./cmd/logcli && \
     mv logcli /usr/sbin && \
     go build ./cmd/loki && \

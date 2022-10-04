@@ -1,3 +1,9 @@
+## 0.0.16 2022-10-04 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Change the way git clone operates in Dockerfile
+
+
 ## 0.0.15 2022-09-16 <dave at tiredofit dot ca>
 
    ### Changed
