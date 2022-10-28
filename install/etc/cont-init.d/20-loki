@@ -79,7 +79,7 @@ fi
 
 touch "${CONFIG_PATH}"/"${CONFIG_FILE}"
 
-update_template /etc/nginx/sites.available/${NGINX_SITE_ENABLED}.conf LOKI_LISTEN_PORT
+update_template /etc/nginx/sites.available/${NGINX_SITE_ENABLED}.conf LISTEN_PORT
 
 if [ "${SETUP_TYPE,,}" = "auto" ] ; then
     print_debug "Configuring Loki"

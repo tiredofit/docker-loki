@@ -1,3 +1,9 @@
+## 0.0.18 2022-10-28 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Fix for LISTEN_PORT in nginx configuration
+
+
 ## 0.0.17 2022-10-05 <dave at tiredofit dot ca>
 
    ### Changed
