@@ -1,16 +1,21 @@
-FROM docker.io/tiredofit/nginx:alpine-3.17
+ARG DISTRO="alpine"
+ARG DISTRO_VARIANT="3.17"
+
+FROM docker.io/tiredofit/nginx:${DISTRO}-${DISTRO_VARIANT}
 LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
-ENV LOKI_VERSION=v2.7.0 \
+ARG LOKI_VERSION
+
+ENV LOKI_VERSION=${LOKI_VERSION:-"v2.7.0"} \
     NGINX_SITE_ENABLED=loki \
     IMAGE_NAME="tiredofit/loki" \
     IMAGE_REPO_URL="https://github.com/tiredofit/docker-loki/"
 
 RUN source /assets/functions/00-container && \
     set -x && \
-    apk update && \
-    apk upgrade && \
-    apk add -t .loki-build-deps \
+    package update && \
+    package upgrade && \
+    package install .loki-build-deps \
                git \
                go \
                && \
@@ -22,11 +27,9 @@ RUN source /assets/functions/00-container && \
     mv loki /usr/sbin && \
     go build ./cmd/loki-canary && \
     mv loki-canary /usr/sbin && \
-    \
-    # Cleanup
-    apk del .loki-build-deps && \
-    rm -rf /usr/src/* && \
-    rm -rf /root/.cache /tmp/* /var/cache/apk/*
+    package remove .loki-build-deps && \
+    package cleanup && \
+    rm -rf /root/.cache \
+           /tmp/*
 
-### Add Files and Assets
 COPY install /
