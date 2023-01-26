@@ -6,7 +6,7 @@ LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
 ARG LOKI_VERSION
 
-ENV LOKI_VERSION=${LOKI_VERSION:-"v2.7.1"} \
+ENV LOKI_VERSION=${LOKI_VERSION:-"v2.7.2"} \
     NGINX_SITE_ENABLED=loki \
     IMAGE_NAME="tiredofit/loki" \
     IMAGE_REPO_URL="https://github.com/tiredofit/docker-loki/"
