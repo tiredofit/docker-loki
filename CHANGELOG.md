@@ -1,3 +1,11 @@
+## 0.0.24 2023-02-01 <dave at tiredofit dot ca>
+
+   ### Added
+      - Loki 2.7.3
+      - Set NGINX Worker processes to 1
+      - Don't create sample HTML file on startup for Nginx
+
+
 ## 0.0.23 2023-01-26 <dave at tiredofit dot ca>
 
    ### Added
