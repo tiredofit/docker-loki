@@ -1,3 +1,9 @@
+## 0.0.36 2023-12-08 <dave at tiredofit dot ca>
+
+   ### Added
+      - Update to tiredofit/nginx:alpine-3.19
+
+
 ## 0.0.35 2023-10-16 <dave at tiredofit dot ca>
 
    ### Added
