@@ -1,3 +1,9 @@
+## 0.0.45 2024-10-17 <dave at tiredofit dot ca>
+
+   ### Added
+      - Loki 3.2.1
+
+
 ## 0.0.44 2024-09-19 <dave at tiredofit dot ca>
 
    ### Added
