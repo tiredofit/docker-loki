@@ -1,3 +1,11 @@
+## 0.0.46 2024-11-19 <dave at tiredofit dot ca>
+
+   ### Added
+      - Loki 3.3.0
+      - Alpine Edge
+      - Strip binaries for smaller image size
+
+
 ## 0.0.45 2024-10-17 <dave at tiredofit dot ca>
 
    ### Added
